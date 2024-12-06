@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Interventions extends Model
 {
-    /** @use HasFactory<\Database\Factories\InterventionsFactory> */
-    use HasFactory;
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function statusHistory()
+    {
+        return $this->morphMany(StatusHistory::class, 'relatedTo');
+    }
 }
