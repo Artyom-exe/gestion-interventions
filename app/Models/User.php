@@ -12,6 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    use HasFactory;
     use HasApiTokens;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -20,6 +21,24 @@ class User extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
 
+
+    public function ticketsAssigned()
+    {
+        return $this->hasMany(Tickets::class, 'assigned_to');
+    }
+
+    public function interventionsAssigned()
+    {
+        return $this->hasMany(Interventions::class, 'assigned_to');
+    }
+
+    public function statusHistories()
+    {
+        return $this->hasMany(StatusHistory::class, 'changed_by');
+    }
+
+
+
     /**
      * The attributes that are mass assignable.
      *
@@ -27,8 +46,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'username',
-        'email',
         'password',
+        'email',
+        'phone_number',
+        'role',
+        'is_active',
     ];
 
     /**
