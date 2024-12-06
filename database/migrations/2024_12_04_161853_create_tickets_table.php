@@ -16,7 +16,6 @@ return new class extends Migration
             $table->text('description');
             $table->enum('status', ['ouvert', 'en_cours', 'fermé'])->default('ouvert');
             $table->enum('priority', ['faible', 'moyenne', 'haute'])->default('moyenne');
-            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
             $table->foreignId('assigned_to')->nullable()->constrained('utilisateurs')->onDelete('set null');
             $table->timestamps();
         });
