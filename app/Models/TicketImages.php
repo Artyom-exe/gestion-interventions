@@ -7,6 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class TicketImages extends Model
 {
-    /** @use HasFactory<\Database\Factories\TicketImagesFactory> */
     use HasFactory;
+
+    protected $table = 'ticket_images'; // Nom de la table
+
+    protected $fillable = [
+        'image_path',
+        'ticket_id',
+    ];
+
+    /**
+     * Relation : Une image appartient à un ticket.
+     */
+    public function ticket()
+    {
+        return $this->belongsTo(Tickets::class);
+    }
 }
