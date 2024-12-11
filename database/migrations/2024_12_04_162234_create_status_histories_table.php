@@ -16,8 +16,8 @@ return new class extends Migration
             $table->enum('status', ['ouvert', 'en_cours', 'fermé', 'prévu', 'terminé']);
             $table->timestamp('changed_at')->useCurrent();
             $table->foreignId('changed_by')->constrained('utilisateurs')->onDelete('cascade');
-            $table->unsignedBigInteger('related_to_id');
-            $table->enum('related_to_type', ['ticket', 'intervention']);
+            $table->unsignedBigInteger('related_id'); // Renommé
+            $table->string('related_type'); // Renommé
             $table->timestamps();
         });
     }

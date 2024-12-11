@@ -36,7 +36,7 @@ class Tickets extends Model
      */
     public function images()
     {
-        return $this->hasMany(TicketImages::class);
+        return $this->hasMany(TicketImages::class, 'ticket_id'); // Correcte clé étrangère
     }
 
     /**
@@ -44,6 +44,6 @@ class Tickets extends Model
      */
     public function statusHistory()
     {
-        return $this->morphMany(StatusHistory::class, 'relatedTo');
+        return $this->morphMany(StatusHistory::class, 'related');
     }
 }
