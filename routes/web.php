@@ -1,5 +1,5 @@
 <?php
-
+ 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,4 +21,9 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [UsersController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [UsersController::class, 'update'])->name('profile.update');
 });
