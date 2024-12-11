@@ -2,22 +2,21 @@
 
 namespace Database\Factories;
 
+use App\Models\Tickets;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tickets>
- */
 class TicketsFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Tickets::class;
+
     public function definition(): array
     {
         return [
-            //
+            'description' => $this->faker->sentence(),
+            'status' => $this->faker->randomElement(['ouvert', 'en_cours', 'fermé']),
+            'priority' => $this->faker->randomElement(['faible', 'moyenne', 'haute']),
+            'assigned_to' => User::factory(), // Associer à un utilisateur
         ];
     }
 }
