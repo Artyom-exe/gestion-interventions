@@ -24,4 +24,5 @@ Route::middleware([
 
     // Routes pour les tickets
     Route::resource('tickets', TicketsController::class);
+    Route::delete('/tickets/{ticket}/images/{image}', [TicketsController::class, 'deleteImage'])->name('tickets.images.destroy');
 });

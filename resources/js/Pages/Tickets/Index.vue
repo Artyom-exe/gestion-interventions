@@ -8,16 +8,50 @@
             <div class="flex justify-between items-center mb-4">
                 <!-- Barre de recherche -->
                 <div class="w-1/3">
-                    <input type="text" placeholder="Rechercher un ticket..."
+                    <input type="text" placeholder="Rechercher un ticket..." v-model="searchQuery"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
                 </div>
 
+                <!-- Filtre par statut -->
+                <div class="w-1/4">
+                    <select v-model="statusFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="">Tous les statuts</option>
+                        <option value="ouvert">Ouvert</option>
+                        <option value="en_cours">En cours</option>
+                        <option value="fermé">Fermé</option>
+                    </select>
+                </div>
+
+                <!-- Filtre par priorité -->
+                <div class="w-1/4">
+                    <select v-model="priorityFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="">Toutes les priorités</option>
+                        <option value="faible">Faible</option>
+                        <option value="moyenne">Moyenne</option>
+                        <option value="haute">Haute</option>
+                    </select>
+                </div>
+
                 <!-- Bouton de création -->
-                <a href="/tickets/create"
+                <NavLink :href="route('tickets.create')"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-md transition duration-300">
                     Créer un Ticket
-                </a>
+                </NavLink>
             </div>
+
+            <!-- Dropdowns pour trier -->
+            <!-- <div class="flex justify-between items-center mb-4">
+                <div class="w-1/4">
+                    <button class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg" @click="sortByStatus">
+                        Trier par Statut
+                    </button>
+                </div>
+                <div class="w-1/4">
+                    <button class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg" @click="sortByPriority">
+                        Trier par Priorité
+                    </button>
+                </div>
+            </div> -->
 
             <!-- Tableau des tickets -->
             <div class="overflow-x-auto">
@@ -35,7 +69,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="ticket in tickets" :key="ticket.id" class="hover:bg-gray-50 transition">
+                        <tr v-for="ticket in sortedTickets" :key="ticket.id" class="hover:bg-gray-50 transition">
                             <td class="px-6 py-4 border-b text-gray-800">{{ ticket.id }}</td>
                             <td class="px-6 py-4 border-b text-gray-800">{{ ticket.description }}</td>
                             <td class="px-6 py-4 border-b">
@@ -74,13 +108,52 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import NavLink from '@/Components/NavLink.vue';
+
 export default {
+    components: {
+        AppLayout,
+        NavLink,
+    },
     props: {
         tickets: Array,
     },
-    components: {
-        AppLayout,
+    data() {
+        return {
+            searchQuery: '',
+            statusFilter: '',
+            priorityFilter: '',
+            sortKey: '',
+            sortOrder: 'asc',
+        };
     },
-
+    computed: {
+        filteredTickets() {
+            return this.tickets.filter(ticket => {
+                const matchesSearch = ticket.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+                const matchesStatus = this.statusFilter ? ticket.status === this.statusFilter : true;
+                const matchesPriority = this.priorityFilter ? ticket.priority === this.priorityFilter : true;
+                return matchesSearch && matchesStatus && matchesPriority;
+            });
+        },
+        sortedTickets() {
+            return this.filteredTickets.sort((a, b) => {
+                let modifier = this.sortOrder === 'asc' ? 1 : -1;
+                if (a[this.sortKey] < b[this.sortKey]) return -1 * modifier;
+                if (a[this.sortKey] > b[this.sortKey]) return 1 * modifier;
+                return 0;
+            });
+        },
+    },
+    methods: {
+        sortByStatus() {
+            this.sortKey = 'status';
+            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+        },
+        sortByPriority() {
+            this.sortKey = 'priority';
+            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+        },
+    },
 };
 </script>
