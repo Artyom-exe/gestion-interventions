@@ -16,12 +16,18 @@ class Tickets extends Model
         'status',
         'priority',
         'assigned_to',
+        'client_id',
     ];
 
     protected $casts = [
         'status' => 'string',
         'priority' => 'string',
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
+    }
 
     /**
      * Relation : Un ticket appartient à un utilisateur (assigné).

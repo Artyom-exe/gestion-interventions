@@ -6,6 +6,8 @@ use App\Models\Tickets;
 use App\Models\TicketImages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use function Ramsey\Uuid\v1;
+use Illuminate\Support\Facades\Log;
 
 class TicketsController extends Controller
 {
@@ -40,16 +42,22 @@ class TicketsController extends Controller
      */
     public function store(Request $request)
     {
+        // Validation
         $validated = $this->validateRequest($request);
 
+        // Création du ticket
         $ticket = Tickets::create($validated);
 
+        // Vérification et traitement des images
         if ($request->hasFile('images')) {
             $this->saveImages($ticket, $request->file('images'));
+        } else {
+            Log::info('Aucune image détectée');
         }
 
         return redirect()->route('tickets.index')->with('success', 'Ticket créé avec succès.');
     }
+
 
     /**
      * Display the specified resource.
@@ -89,6 +97,16 @@ class TicketsController extends Controller
         $validated = $this->validateRequest($request);
         $ticket->update($validated);
 
+        // Supprimer les images marquées pour suppression
+        if ($request->has('removedImages')) {
+            foreach ($request->input('removedImages') as $imageId) {
+                $image = TicketImages::findOrFail($imageId);
+                Storage::disk('public')->delete($image->image_path);
+                $image->delete();
+            }
+        }
+
+        // Ajouter de nouvelles images
         if ($request->hasFile('images')) {
             $this->saveImages($ticket, $request->file('images'));
         }
@@ -103,27 +121,10 @@ class TicketsController extends Controller
     {
         $ticket = Tickets::with('images')->findOrFail($id);
 
-        foreach ($ticket->images as $image) {
-            Storage::disk('public')->delete($image->image_path);
-        }
-
         $ticket->images()->delete();
         $ticket->delete();
 
         return redirect()->route('tickets.index')->with('success', 'Ticket et ses images supprimés avec succès.');
-    }
-
-    /**
-     * Delete a specific image from a ticket.
-     */
-    public function deleteImage($ticketId, $imageId)
-    {
-        $image = TicketImages::where('ticket_id', $ticketId)->findOrFail($imageId);
-
-        Storage::disk('public')->delete($image->image_path);
-        $image->delete();
-
-        return redirect()->back()->with('success', 'Image supprimée avec succès.');
     }
 
     /**

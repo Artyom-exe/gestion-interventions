@@ -16,7 +16,8 @@ class TicketsFactory extends Factory
             'description' => $this->faker->sentence(),
             'status' => $this->faker->randomElement(['ouvert', 'en_cours', 'fermé']),
             'priority' => $this->faker->randomElement(['faible', 'moyenne', 'haute']),
-            'assigned_to' => User::factory(), // Associer à un utilisateur
+            'assigned_to' => User::factory()->state(['role' => 'technicien']), // Associer à un utilisateur
+            'client_id' => User::factory()->state(['role' => 'client']),
         ];
     }
 }

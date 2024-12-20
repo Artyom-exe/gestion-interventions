@@ -1,3 +1,48 @@
+<script setup>
+import { ref, computed } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import NavLink from '@/Components/NavLink.vue';
+
+const props = defineProps({
+    tickets: Array,
+});
+
+const searchQuery = ref('');
+const statusFilter = ref('');
+const priorityFilter = ref('');
+const sortKey = ref('');
+const sortOrder = ref('asc');
+
+const filteredTickets = computed(() => {
+    return props.tickets.filter(ticket => {
+        const matchesSearch = ticket.description.toLowerCase().includes(searchQuery.value.toLowerCase());
+        const matchesStatus = statusFilter.value ? ticket.status === statusFilter.value : true;
+        const matchesPriority = priorityFilter.value ? ticket.priority === priorityFilter.value : true;
+        return matchesSearch && matchesStatus && matchesPriority;
+    });
+});
+
+const sortedTickets = computed(() => {
+    return filteredTickets.value.sort((a, b) => {
+        let modifier = sortOrder.value === 'asc' ? 1 : -1;
+        if (a[sortKey.value] < b[sortKey.value]) return -1 * modifier;
+        if (a[sortKey.value] > b[sortKey.value]) return 1 * modifier;
+        return 0;
+    });
+});
+
+const sortByStatus = () => {
+    sortKey.value = 'status';
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+};
+
+const sortByPriority = () => {
+    sortKey.value = 'priority';
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+};
+</script>
+
 <template>
     <AppLayout title="Ticket-page">
         <div class="container mx-auto p-4">
@@ -105,55 +150,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import NavLink from '@/Components/NavLink.vue';
-
-export default {
-    components: {
-        AppLayout,
-        NavLink,
-    },
-    props: {
-        tickets: Array,
-    },
-    data() {
-        return {
-            searchQuery: '',
-            statusFilter: '',
-            priorityFilter: '',
-            sortKey: '',
-            sortOrder: 'asc',
-        };
-    },
-    computed: {
-        filteredTickets() {
-            return this.tickets.filter(ticket => {
-                const matchesSearch = ticket.description.toLowerCase().includes(this.searchQuery.toLowerCase());
-                const matchesStatus = this.statusFilter ? ticket.status === this.statusFilter : true;
-                const matchesPriority = this.priorityFilter ? ticket.priority === this.priorityFilter : true;
-                return matchesSearch && matchesStatus && matchesPriority;
-            });
-        },
-        sortedTickets() {
-            return this.filteredTickets.sort((a, b) => {
-                let modifier = this.sortOrder === 'asc' ? 1 : -1;
-                if (a[this.sortKey] < b[this.sortKey]) return -1 * modifier;
-                if (a[this.sortKey] > b[this.sortKey]) return 1 * modifier;
-                return 0;
-            });
-        },
-    },
-    methods: {
-        sortByStatus() {
-            this.sortKey = 'status';
-            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-        },
-        sortByPriority() {
-            this.sortKey = 'priority';
-            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-        },
-    },
-};
-</script>

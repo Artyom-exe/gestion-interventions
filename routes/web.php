@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\TicketsController;
+use App\Http\Controllers\TicketImagesController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

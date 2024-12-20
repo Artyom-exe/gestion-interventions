@@ -6,7 +6,7 @@
                 <NavLink :href="route('tickets.index')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
                     Retour
                 </NavLink>
-                <h1 class="text-3xl font-bold text-gray-800">Modifier le Ticket #{{ ticket.id }}</h1>
+                <h1 class="text-3xl font-bold text-gray-800">Modifier le Ticket #{{ props.ticket.id }}</h1>
             </div>
 
             <!-- Formulaire -->
@@ -20,11 +20,11 @@
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                             <option value="" disabled>Sélectionner un client</option>
-                            <option v-for="client in clients" :key="client.id" :value="client.id">
+                            <option v-for="client in props.clients" :key="client.id" :value="client.id">
                                 {{ client.username }}
                             </option>
                         </select>
-                        <InputError :message="errors.client_id" class="mt-2" />
+                        <InputError :message="props.errors.client_id" class="mt-2" />
                     </div>
 
                     <!-- Description -->
@@ -36,7 +36,7 @@
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             rows="4"
                         ></textarea>
-                        <InputError :message="errors.description" class="mt-2" />
+                        <InputError :message="props.errors.description" class="mt-2" />
                     </div>
 
                     <!-- Priorité et Statut -->
@@ -52,7 +52,7 @@
                                 <option value="moyenne">Moyenne</option>
                                 <option value="haute">Haute</option>
                             </select>
-                            <InputError :message="errors.priority" class="mt-2" />
+                            <InputError :message="props.errors.priority" class="mt-2" />
                         </div>
 
                         <!-- Statut -->
@@ -66,7 +66,7 @@
                                 <option value="en_cours">En cours</option>
                                 <option value="fermé">Fermé</option>
                             </select>
-                            <InputError :message="errors.status" class="mt-2" />
+                            <InputError :message="props.errors.status" class="mt-2" />
                         </div>
                     </div>
 
@@ -78,19 +78,23 @@
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                             <option value="" disabled>Sélectionner un technicien</option>
-                            <option v-for="technician in technicians" :key="technician.id" :value="technician.id">
+                            <option v-for="technician in props.technicians" :key="technician.id" :value="technician.id">
                                 {{ technician.username }}
                             </option>
                         </select>
-                        <InputError :message="errors.assigned_to" class="mt-2" />
+                        <InputError :message="props.errors.assigned_to" class="mt-2" />
                     </div>
 
                     <!-- Images -->
                     <div class="mb-4">
                         <label class="block text-gray-700 font-bold">Images</label>
-                        <!-- Prévisualisation des images existantes -->
+                        <!-- Images existantes -->
                         <div v-if="form.existingImages.length" class="mt-4 grid grid-cols-3 gap-4">
-                            <div v-for="(image, index) in form.existingImages" :key="image.id" class="relative">
+                            <div
+                                v-for="(image, index) in form.existingImages"
+                                :key="image.id"
+                                class="relative"
+                            >
                                 <img
                                     :src="`/storage/${image.image_path}`"
                                     alt="Image du ticket"
@@ -149,74 +153,77 @@
     </AppLayout>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
+import { router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import NavLink from '@/Components/NavLink.vue';
 import InputError from '@/Components/InputError.vue';
 
-export default {
-    components: {
-        AppLayout,
-        NavLink,
-        InputError,
-    },
-    props: {
-        ticket: Object,
-        clients: Array,
-        technicians: Array,
-        errors: Object,
-    },
-    data() {
-        return {
-            form: {
-                client_id: this.ticket.client_id || '',
-                description: this.ticket.description || '',
-                priority: this.ticket.priority || 'moyenne',
-                status: this.ticket.status || 'ouvert',
-                assigned_to: this.ticket.assigned_to || '',
-                existingImages: this.ticket.images || [],
-                newImages: [],
-            },
+// Props
+const props = defineProps({
+    ticket: Object,
+    clients: Array,
+    technicians: Array,
+    errors: Object,
+});
+
+// Form
+const form = useForm({
+    client_id: props.ticket.client_id || '',
+    description: props.ticket.description || '',
+    priority: props.ticket.priority || 'moyenne',
+    status: props.ticket.status || 'ouvert',
+    assigned_to: props.ticket.assigned_to || '',
+    newImages: [],
+    existingImages: props.ticket.images || [],
+    removedImages: [], // Ajout d'un tableau pour suivre les images supprimées
+});
+
+// Methods
+const handleFileUpload = (event) => {
+    const files = Array.from(event.target.files);
+    files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            form.newImages.push({ file, preview: e.target.result });
         };
-    },
-    methods: {
-        submitForm() {
-            const formData = new FormData();
-            formData.append('client_id', this.form.client_id);
-            formData.append('description', this.form.description);
-            formData.append('priority', this.form.priority);
-            formData.append('status', this.form.status);
-            formData.append('assigned_to', this.form.assigned_to);
+        reader.readAsDataURL(file);
+    });
+};
 
-            this.form.newImages.forEach((image) => {
-                formData.append('images[]', image.file);
-            });
+const removeImage = (imageId, index) => {
+    form.existingImages.splice(index, 1);
+    form.removedImages.push(imageId); // Ajouter l'image supprimée au tableau removedImages
+};
 
-            this.$inertia.post(route('tickets.update', { id: this.ticket.id }), formData);
-        },
-        handleFileUpload(event) {
-            const files = Array.from(event.target.files);
-            files.forEach((file) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.form.newImages.push({
-                        file,
-                        preview: e.target.result,
-                    });
-                };
-                reader.readAsDataURL(file);
-            }); 
-        },
-        removeImage(imageId, index) {
-            this.$inertia.delete(route('tickets.deleteImage', { ticketId: this.ticket.id, imageId }));
-            this.form.existingImages.splice(index, 1);
-        },
-        removeNewImage(index) {
-            this.form.newImages.splice(index, 1);
-        },
-        cancel() {
-            this.$inertia.get(route('tickets.index'));
-        },
-    },
+const removeNewImage = (index) => {
+    form.newImages.splice(index, 1);
+};
+
+const submitForm = () => {
+    const formData = new FormData();
+    formData.append('_method', 'PUT'); // Ajout de cette ligne pour spécifier la méthode PUT
+    formData.append('client_id', form.client_id);
+    formData.append('description', form.description);
+    formData.append('priority', form.priority);
+    formData.append('status', form.status);
+    formData.append('assigned_to', form.assigned_to);
+
+    form.newImages.forEach((image, index) => {
+        formData.append(`images[${index}]`, image.file);
+    });
+
+    form.removedImages.forEach((imageId, index) => {
+        formData.append(`removedImages[${index}]`, imageId);
+    });
+
+    router.post(route('tickets.update', props.ticket.id), formData, {
+        onSuccess: () => form.reset('newImages', 'removedImages'),
+    });
+};
+
+const cancel = () => {
+    router.get(route('tickets.index'));
 };
 </script>

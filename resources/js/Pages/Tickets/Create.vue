@@ -1,3 +1,65 @@
+<script setup>
+import { ref } from 'vue';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import NavLink from '@/Components/NavLink.vue';
+import InputError from '@/Components/InputError.vue';
+
+const props = defineProps({
+    clients: Array,
+    technicians: Array,
+    errors: Object,
+});
+
+const form = useForm({
+    client_id: '',
+    description: '',
+    priority: 'moyenne',
+    status: 'ouvert',
+    assigned_to: '',
+    images: [],
+});
+
+const submitForm = () => {
+    const formData = new FormData();
+    formData.append('client_id', form.client_id);
+    formData.append('description', form.description);
+    formData.append('priority', form.priority);
+    formData.append('status', form.status);
+    formData.append('assigned_to', form.assigned_to);
+
+    form.images.forEach((image, index) => {
+        formData.append(`images[${index}]`, image.file);
+    });
+
+    router.post(route('tickets.store'), formData, {
+        onSuccess: () => form.reset('images'),
+    });
+};
+
+const handleFileUpload = (event) => {
+    const files = Array.from(event.target.files);
+    files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            form.images.push({
+                file,
+                preview: e.target.result,
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+};
+
+const removeImage = (index) => {
+    form.images.splice(index, 1);
+};
+
+const cancel = () => {
+    router.get(route('tickets.index'));
+};
+</script>
+
 <template>
     <AppLayout title="Créer un Ticket">
         <div class="container mx-auto p-4">
@@ -93,7 +155,7 @@
                             class="w-full border border-dashed border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         <div class="grid grid-cols-3 gap-4 mt-4">
-                            <div v-for="(image, index) in form.newImages" :key="index" class="relative">
+                            <div v-for="(image, index) in form.images" :key="index" class="relative">
                                 <img
                                     :src="image.preview"
                                     alt="Prévisualisation"
@@ -124,69 +186,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import NavLink from '@/Components/NavLink.vue';
-import InputError from '@/Components/InputError.vue';
-
-export default {
-    components: {
-        AppLayout,
-        NavLink,
-        InputError,
-    },
-    props: {
-        clients: Array,
-        technicians: Array,
-        errors: Object,
-    },
-    data() {
-        return {
-            form: {
-                client_id: '',
-                description: '',
-                priority: 'moyenne',
-                status: 'ouvert',
-                assigned_to: '',
-                newImages: [],
-            },
-        };
-    },
-    methods: {
-        submitForm() {
-            const formData = new FormData();
-            formData.append('client_id', this.form.client_id);
-            formData.append('description', this.form.description);
-            formData.append('priority', this.form.priority);
-            formData.append('status', this.form.status);
-            formData.append('assigned_to', this.form.assigned_to);
-
-            this.form.newImages.forEach((image) => {
-                formData.append('images[]', image.file);
-            });
-
-            this.$inertia.post(this.route('tickets.store'), formData);
-        },
-        handleFileUpload(event) {
-            const files = Array.from(event.target.files);
-            files.forEach((file) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.form.newImages.push({
-                        file,
-                        preview: e.target.result,
-                    });
-                };
-                reader.readAsDataURL(file);
-            });
-        },
-        removeImage(index) {
-            this.form.newImages.splice(index, 1);
-        },
-        cancel() {
-            this.$inertia.get(this.route('tickets.index'));
-        },
-    },
-};
-</script>
