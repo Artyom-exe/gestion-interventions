@@ -12,8 +12,14 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory;
-    use HasApiTokens;
+      /**
+     * Le nom de la table associée.
+     *
+     * @var string
+     */
+    protected $table = 'utilisateurs';
+
+     use HasApiTokens, Notifiable;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;

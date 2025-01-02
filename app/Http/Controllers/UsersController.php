@@ -2,81 +2,101 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 
 class UsersController extends Controller
 {
-    /**
-     * Display a listing of the resource.
+
+/**
+     * Affiche la liste des utilisateurs.
      */
     public function index()
     {
-        //
+        $users = User::all(); // Récupère tous les utilisateurs
+        return Inertia::render('Users/Index', [
+            'users' => $users,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
+
+     /**
+     * Affiche le formulaire d'ajout d'utilisateur.
      */
     public function create()
     {
-        //
+        return Inertia::render('Users/AddUser');
     }
 
-    /**
-     * Store a newly created resource in storage.
+
+/**
+ * Traite le formulaire d'ajout d'utilisateur.
+ */
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'username' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:utilisateurs',
+        'password' => 'required|string|min:8|confirmed',
+        'role' => 'required|in:admin,technicien,client',
+        'is_active' => 'required|boolean',
+    ]);
+
+    User::create([
+        'username' => $validated['username'],
+        'email' => $validated['email'],
+        'password' => bcrypt($validated['password']),
+        'role' => $validated['role'],
+        'is_active' => $validated['is_active'],
+    ]);
+
+    return redirect()->route('users.index')->with('success', 'Utilisateur ajouté avec succès.');
+}
+
+
+ /**
+     * Affiche le formulaire d'édition d'un utilisateur existant.
      */
-    public function store(Request $request)
+    public function edit($id)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        return Auth::user();
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request)
-    {
-        $user = Auth::user(); // si Utilisateur connecté
-
-        $validated = $request->validate([
-            'username' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'phone_number' => 'nullable|string|max:20',
-            'timezone' => 'nullable|string|max:50',
-            'email_notifications' => 'boolean',
-            'desktop_notifications' => 'boolean',
-        ]);
-
-        $user->update($validated);
-
-        return response()->json([
-            'message' => 'Profil mis à jour avec succès.',
+        $user = User::findOrFail($id);
+        return Inertia::render('Users/Edit', [
             'user' => $user,
         ]);
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Met à jour les informations de profil de l'utilisateur connecté.
      */
-    public function destroy(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'username' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:utilisateurs,email,' . $user->id,
+            'role' => 'required|in:admin,technicien,client',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('users.index')->with('success', 'Utilisateur mis à jour avec succès.');
+    }
+
+
+    /**
+     * Supprime le compte de l'utilisateur connecté.
+     */
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'Utilisateur supprimé avec succès.');
     }
 }

@@ -1,7 +1,8 @@
 <?php
- 
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UsersController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -23,7 +24,15 @@ Route::middleware([
     })->name('dashboard');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [UsersController::class, 'show'])->name('profile.show');
-    Route::put('/profile', [UsersController::class, 'update'])->name('profile.update');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/users', [UsersController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UsersController::class, 'create'])->name('users.create');
+    Route::post('/users', [UsersController::class, 'store'])->name('users.store');
+    Route::get('/users/{id}/edit', [UsersController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{id}', [UsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UsersController::class, 'destroy'])->name('users.destroy');
+
+
 });
+
