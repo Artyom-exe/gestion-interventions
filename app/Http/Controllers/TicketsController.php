@@ -64,7 +64,7 @@ class TicketsController extends Controller
      */
     public function show($id)
     {
-        $ticket = Tickets::with(['assignedUser', 'images', 'statusHistory'])->findOrFail($id);
+        $ticket = Tickets::with(['client', 'assignedUser', 'images', 'statusHistory'])->findOrFail($id);
 
         return \Inertia\Inertia::render('Tickets/Detail', [
             'ticket' => $ticket,

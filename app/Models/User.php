@@ -68,4 +68,9 @@ class User extends Authenticatable
     {
         $this->attributes['password'] = bcrypt($value);
     }
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
+    }
 }
