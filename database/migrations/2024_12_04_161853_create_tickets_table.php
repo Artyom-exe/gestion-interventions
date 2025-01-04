@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->text('description');
-            $table->enum('status', ['ouvert', 'en_cours', 'fermé'])->default('ouvert');
-            $table->enum('priority', ['faible', 'moyenne', 'haute'])->default('moyenne');
-            $table->foreignId('assigned_to')->nullable()->constrained('utilisateurs')->onDelete('set null');
+            $table->unsignedBigInteger('client_id')->nullable(); // Associer un client
+            $table->unsignedBigInteger('assigned_to')->nullable(); // Technicien assigné
+            $table->string('description');
+            $table->enum('priority', ['faible', 'moyenne', 'haute']);
+            $table->enum('status', ['ouvert', 'en_cours', 'fermé']);
             $table->timestamps();
+
+            $table->foreign('client_id')->references('id')->on('utilisateurs')->onDelete('cascade');
+            $table->foreign('assigned_to')->references('id')->on('utilisateurs')->onDelete('set null');
         });
     }
 

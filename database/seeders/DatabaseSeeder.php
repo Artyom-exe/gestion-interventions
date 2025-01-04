@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Tickets;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +13,36 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Créez les utilisateurs avec des rôles variés
+        $this->seedUsers();
 
-        User::factory()->create([
-            'username' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Créez les tickets
+        $this->seedTickets();
+    }
+
+    /**
+     * Seed Users.
+     */
+    private function seedUsers(): void
+    {
+        // Générer des utilisateurs aléatoires
+        User::factory()->count(10)->create();
+
+        // Ajouter des administrateurs spécifiques
+        User::factory()->count(2)->state(['role' => 'admin'])->create();
+
+        // Ajouter des techniciens spécifiques
+        User::factory()->count(5)->state(['role' => 'technicien'])->create();
+
+        // Ajouter des clients spécifiques
+        User::factory()->count(20)->state(['role' => 'client'])->create();
+    }
+
+    /**
+     * Seed Tickets.
+     */
+    private function seedTickets(): void
+    {
+        Tickets::factory()->count(50)->create();
     }
 }

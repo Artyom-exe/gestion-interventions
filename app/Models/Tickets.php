@@ -16,12 +16,18 @@ class Tickets extends Model
         'status',
         'priority',
         'assigned_to',
+        'client_id',
     ];
 
     protected $casts = [
         'status' => 'string',
         'priority' => 'string',
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
+    }
 
     /**
      * Relation : Un ticket appartient à un utilisateur (assigné).
@@ -36,7 +42,7 @@ class Tickets extends Model
      */
     public function images()
     {
-        return $this->hasMany(TicketImages::class);
+        return $this->hasMany(TicketImages::class, 'ticket_id'); // Correcte clé étrangère
     }
 
     /**
@@ -44,6 +50,6 @@ class Tickets extends Model
      */
     public function statusHistory()
     {
-        return $this->morphMany(StatusHistory::class, 'relatedTo');
+        return $this->morphMany(StatusHistory::class, 'related');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,15 +27,14 @@ class Interventions extends Model
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
-  
+
     public function images()
     {
         return $this->hasMany(InterventionImages::class);
     }
-  
+
     public function statusHistories()
     {
         return $this->morphMany(StatusHistory::class, 'related_to');
     }
 }
-
