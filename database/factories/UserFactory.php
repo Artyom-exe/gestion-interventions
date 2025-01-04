@@ -25,7 +25,7 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'phone_number' => $this->faker->phoneNumber(),
             'role' => $this->faker->randomElement(['admin', 'technicien', 'client']),
-            'is_active' => $this->faker->boolean(100), // 80% de chances que l'utilisateur soit actif
+            'is_active' => $this->faker->boolean(80), // 80% de chances que l'utilisateur soit actif
         ];
     }
 
