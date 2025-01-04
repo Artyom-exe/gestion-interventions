@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000">
+    <!-- Main Background -->
+    <rect width="1400" height="1000" fill="#f3f4f6"/>
+    
+    <!-- Login Card -->
+    <g transform="translate(500, 200)">
+        <rect width="400" height="500" fill="white" rx="8" stroke="#e5e7eb"/>
+        
+        <!-- Logo Area -->
+        <g transform="translate(125, 40)">
+            <rect width="150" height="60" fill="#e5e7eb" rx="4"/>
+            <text x="75" y="35" fill="#64748b" font-size="16" text-anchor="middle">LOGO</text>
+        </g>
+        
+        <!-- Title -->
+        <text x="200" y="140" fill="#1e293b" font-size="24" text-anchor="middle" font-weight="bold">Connexion</text>
+        
+        <!-- Email Input -->
+        <g transform="translate(50, 180)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Email</text>
+            <rect y="10" width="300" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+            <text x="15" y="37" fill="#94a3b8" font-size="14">email@exemple.com</text>
+        </g>
+        
+        <!-- Password Input -->
+        <g transform="translate(50, 260)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Mot de passe</text>
+            <rect y="10" width="300" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+            <text x="15" y="37" fill="#94a3b8" font-size="14">••••••••</text>
+        </g>
+        
+        <!-- Remember Me -->
+        <g transform="translate(50, 330)">
+            <rect width="20" height="20" fill="#f9fafb" stroke="#e5e7eb" rx="4"/>
+            <text x="30" y="15" fill="#64748b" font-size="14">Se souvenir de moi</text>
+        </g>
+        
+        <!-- Login Button -->
+        <g transform="translate(50, 380)">
+            <rect width="300" height="45" fill="#2563eb" rx="6"/>
+            <text x="150" y="28" fill="white" font-size="14" text-anchor="middle">Se connecter</text>
+        </g>
+        
+        <!-- Forgot Password Link -->
+        <g transform="translate(50, 450)">
+            <text x="150" y="0" fill="#2563eb" font-size="14" text-anchor="middle" text-decoration="underline">Mot de passe oublié ?</text>
+        </g>
+        
+        <!-- Register Link -->
+        <g transform="translate(100, 480)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Pas de compte ?</text>
+            <text x="100" y="0" fill="#2563eb" font-size="14">Créer un compte</text>
+        </g>
+    </g>
+</svg>

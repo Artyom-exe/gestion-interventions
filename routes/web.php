@@ -4,6 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use Inertia\Inertia;
+use App\Http\Controllers\TicketsController;
+use App\Http\Controllers\TicketImagesController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -17,11 +20,14 @@ Route::get('/', function () {
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    // Routes pour les tickets
+    Route::resource('tickets', TicketsController::class);
+    Route::delete('/tickets/{ticket}/images/{image}', [TicketsController::class, 'deleteImage'])->name('tickets.images.destroy');
 });
 
 

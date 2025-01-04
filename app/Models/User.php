@@ -2,54 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-      /**
-     * Le nom de la table associée.
-     *
-     * @var string
-     */
-    protected $table = 'utilisateurs';
+    use HasApiTokens, HasFactory, Notifiable;
+  
+    protected $table = 'utilisateurs'; // Nom de la table personnalisée
 
-     use HasApiTokens, Notifiable;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory;
-    use HasProfilePhoto;
-    use Notifiable;
-    use TwoFactorAuthenticatable;
-
-
-    public function ticketsAssigned()
-    {
-        return $this->hasMany(Tickets::class, 'assigned_to');
-    }
-
-    public function interventionsAssigned()
-    {
-        return $this->hasMany(Interventions::class, 'assigned_to');
-    }
-
-    public function statusHistories()
-    {
-        return $this->hasMany(StatusHistory::class, 'changed_by');
-    }
-
-
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'username',
         'password',
@@ -59,37 +21,56 @@ class User extends Authenticatable
         'is_active',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
+     * Relation : Un utilisateur peut être assigné à plusieurs tickets.
      */
-    protected $appends = [
-        'profile_photo_url',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function tickets()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Tickets::class, 'assigned_to');
+    }
+
+    /**
+     * Relation : Un utilisateur peut être assigné à plusieurs interventions.
+     */
+    public function interventions()
+    {
+        return $this->hasMany(Interventions::class, 'assigned_to');
+    }
+
+    /**
+     * Relation : Historique des statuts modifiés par cet utilisateur.
+     */
+    public function statusHistory()
+    {
+        return $this->hasMany(StatusHistory::class, 'changed_by');
+    }
+
+    public function statusChanges()
+    {
+        return $this->hasMany(StatusHistory::class, 'changed_by');
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
     }
 }

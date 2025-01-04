@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000">
+    <!-- Main Background -->
+    <rect width="1400" height="1000" fill="#f3f4f6"/>
+    
+    <!-- Register Card -->
+    <g transform="translate(500, 150)">
+        <rect width="400" height="700" fill="white" rx="8" stroke="#e5e7eb"/>
+        
+        <!-- Logo Area -->
+        <g transform="translate(125, 40)">
+            <rect width="150" height="60" fill="#e5e7eb" rx="4"/>
+            <text x="75" y="35" fill="#64748b" font-size="16" text-anchor="middle">LOGO</text>
+        </g>
+        
+        <!-- Title -->
+        <text x="200" y="140" fill="#1e293b" font-size="24" text-anchor="middle" font-weight="bold">Créer un compte</text>
+        
+        <!-- Name Inputs -->
+        <g transform="translate(50, 180)">
+            <!-- First Name -->
+            <g>
+                <text x="0" y="0" fill="#64748b" font-size="14">Prénom</text>
+                <rect y="10" width="140" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+                <text x="15" y="37" fill="#94a3b8" font-size="14">John</text>
+            </g>
+            <!-- Last Name -->
+            <g transform="translate(160, 0)">
+                <text x="0" y="0" fill="#64748b" font-size="14">Nom</text>
+                <rect y="10" width="140" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+                <text x="15" y="37" fill="#94a3b8" font-size="14">Doe</text>
+            </g>
+        </g>
+        
+        <!-- Email Input -->
+        <g transform="translate(50, 260)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Email professionnel</text>
+            <rect y="10" width="300" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+            <text x="15" y="37" fill="#94a3b8" font-size="14">email@entreprise.com</text>
+        </g>
+        
+        <!-- Company Input -->
+        <g transform="translate(50, 340)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Entreprise</text>
+            <rect y="10" width="300" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+            <text x="15" y="37" fill="#94a3b8" font-size="14">Nom de l'entreprise</text>
+        </g>
+        
+        <!-- Phone Input -->
+        <g transform="translate(50, 420)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Téléphone</text>
+            <rect y="10" width="300" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+            <text x="15" y="37" fill="#94a3b8" font-size="14">+33 6 XX XX XX XX</text>
+        </g>
+        
+        <!-- Password Input -->
+        <g transform="translate(50, 500)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Mot de passe</text>
+            <rect y="10" width="300" height="45" fill="#f9fafb" stroke="#e5e7eb" rx="6"/>
+            <text x="15" y="37" fill="#94a3b8" font-size="14">••••••••</text>
+            <text x="0" y="70" fill="#94a3b8" font-size="12">8 caractères minimum, 1 majuscule, 1 chiffre</text>
+        </g>
+        
+        <!-- Terms Checkbox -->
+        <g transform="translate(50, 580)">
+            <rect width="20" height="20" fill="#f9fafb" stroke="#e5e7eb" rx="4"/>
+            <text x="30" y="15" fill="#64748b" font-size="14">J'accepte les conditions d'utilisation</text>
+        </g>
+        
+        <!-- Register Button -->
+        <g transform="translate(50, 620)">
+            <rect width="300" height="45" fill="#2563eb" rx="6"/>
+            <text x="150" y="28" fill="white" font-size="14" text-anchor="middle">Créer mon compte</text>
+        </g>
+        
+        <!-- Login Link -->
+        <g transform="translate(100, 680)">
+            <text x="0" y="0" fill="#64748b" font-size="14">Déjà un compte ?</text>
+            <text x="100" y="0" fill="#2563eb" font-size="14">Se connecter</text>
+        </g>
+    </g>
+</svg>
