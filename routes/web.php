@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use Inertia\Inertia;
 use App\Http\Controllers\TicketsController;
-use App\Http\Controllers\TicketImagesController;
+use App\Http\Controllers\AdminController;
+
 
 
 Route::get('/', function () {
@@ -28,6 +29,10 @@ Route::middleware([
     // Routes pour les tickets
     Route::resource('tickets', TicketsController::class);
     Route::delete('/tickets/{ticket}/images/{image}', [TicketsController::class, 'deleteImage'])->name('tickets.images.destroy');
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    });
 });
 
 
