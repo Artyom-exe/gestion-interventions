@@ -59,9 +59,7 @@ class UserFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the user is a client.
-     */
+
     public function client(): static
     {
         return $this->state(fn(array $attributes) => [

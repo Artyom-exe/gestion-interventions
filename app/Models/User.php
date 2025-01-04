@@ -8,14 +8,14 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
-
+    use HasApiTokens, HasFactory, Notifiable;
+  
     protected $table = 'utilisateurs'; // Nom de la table personnalisée
 
     protected $fillable = [
         'username',
-        'email',
         'password',
+        'email',
         'phone_number',
         'role',
         'is_active',

@@ -2,15 +2,25 @@
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
+import Banner from '@/Components/Banner.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
+import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 
 defineProps({
     title: String,
 });
 
 const showingNavigationDropdown = ref(false);
+
+const switchToTeam = (team) => {
+    router.put(
+        route('current-team.update'),
+        { team_id: team.id },
+        { preserveState: false }
+    );
+};
 
 const logout = () => {
     router.post(route('logout'));
@@ -24,8 +34,8 @@ const logout = () => {
             <!-- Logo -->
             <div class="p-4 border-b">
                 <Link :href="route('dashboard')" class="flex items-center space-x-2">
-                <ApplicationMark class="block h-10 w-auto" />
-                <span class="text-lg font-bold text-gray-800">MonApp</span>
+                    <ApplicationMark class="block h-10 w-auto" />
+                    <span class="text-lg font-bold text-gray-800">MonApp</span>
                 </Link>
             </div>
 
@@ -54,17 +64,6 @@ const logout = () => {
                             <span class="ml-3">Tickets</span>
                         </NavLink>
                     </li>
-                    <!-- <li>
-                        <NavLink :href="route('clients.index')" :active="route().current('clients.index')"
-                            class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 10h11m4 0h3m-7 6h7M3 16h7m0 0v6m0-6l-6 6m6-6l6 6" />
-                            </svg>
-                            <span class="ml-3">Utilisateurs</span>
-                        </NavLink>
-                    </li> -->
                 </ul>
             </div>
 
@@ -102,7 +101,17 @@ const logout = () => {
 
         <!-- Main Content -->
         <main class="flex-1 p-6 bg-white shadow-lg rounded-lg">
-            <slot />
+            <!-- Page Heading -->
+            <header v-if="$slots.header" class="bg-white shadow">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <slot name="header" />
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main>
+                <slot />
+            </main>
         </main>
     </div>
 </template>
