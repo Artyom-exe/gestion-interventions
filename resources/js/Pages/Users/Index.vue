@@ -36,11 +36,11 @@ function editUser(id) {
     router.visit(route("users.edit", id));
 }
 
-function confirmDeletion(id) {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-        router.delete(route("users.destroy", id));
+const deleteUser = (id) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer ce ticket ?")) {
+        router.delete(route('users.destroy', id));
     }
-}
+};
 </script>
 
 <template>
@@ -161,6 +161,7 @@ function confirmDeletion(id) {
                                     >
                                         Supprimer
                                     </button>
+
                                 </td>
                             </tr>
                         </tbody>

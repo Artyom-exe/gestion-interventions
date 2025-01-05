@@ -31,6 +31,7 @@ class TicketsController extends Controller
         return \Inertia\Inertia::render('Tickets/Index', [
             'tickets' => $tickets,
             'authUser' => $user, // Ajout de l'utilisateur connecté
+            'csrf_token' => csrf_token(), // Ajouter ici
         ]);
     }
 
@@ -141,28 +142,27 @@ class TicketsController extends Controller
      */
     public function destroy($id)
     {
-        // Bloquer les techniciens
-        if (auth()->user()->role === 'technicien') {
-            abort(403, 'Vous n’êtes pas autorisé à supprimer un ticket.');
+        try {
+
+            if (auth()->user()->role === 'technicien') {
+                abort(403, 'Vous n’êtes pas autorisé à supprimer un ticket.');
+            }
+
+            $ticket = Tickets::with('images')->findOrFail($id);
+
+            foreach ($ticket->images as $image) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+
+            $ticket->images()->delete();
+            $ticket->delete();
+
+            return redirect()->route('tickets.index')->with('success', 'Ticket et ses images supprimés avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->route('tickets.index')->with('error', 'Une erreur s\'est produite lors de la suppression.');
         }
-
-        // Récupération du ticket avec les images associées
-        $ticket = Tickets::with('images')->findOrFail($id);
-
-        // Suppression des fichiers d'image sur le disque
-        foreach ($ticket->images as $image) {
-            Storage::disk('public')->delete($image->image_path);
-        }
-
-        // Suppression des images dans la base de données
-        $ticket->images()->delete();
-
-        // Suppression du ticket
-        $ticket->delete();
-
-        // Redirection avec un message de succès
-        return redirect()->route('tickets.index')->with('success', 'Ticket et ses images supprimés avec succès.');
     }
+
 
 
     /**

@@ -30,7 +30,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
     })->name('dashboard');
 
     // Routes pour les tickets
-    Route::resource('tickets', TicketsController::class)->except(['edit', 'destroy']); // Techniciens
+    Route::resource('tickets', TicketsController::class)->except(['edit']); // Techniciens
     Route::delete('/tickets/{ticket}/images/{image}', [TicketsController::class, 'deleteImage'])->name('tickets.images.destroy');
 
     // Tableau de bord pour les administrateurs

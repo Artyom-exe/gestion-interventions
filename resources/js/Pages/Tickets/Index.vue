@@ -35,6 +35,14 @@ const sortedTickets = computed(() => {
         return 0;
     });
 });
+
+const deleteTicket = (id) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+        router.delete(route('tickets.destroy', id));
+    }
+};
+
+
 </script>
 
 <template>
@@ -133,11 +141,18 @@ const sortedTickets = computed(() => {
                                 </template>
 
                                 <!-- Lien Supprimer (réservé aux administrateurs) -->
-                                <template v-if="authUser.role === 'admin'">
-                                    <a :href="route('tickets.destroy', ticket.id)" class="text-red-500 hover:underline">
-                                        Supprimer
-                                    </a>
-                                </template>
+                            <template v-if="authUser.role === 'admin'">
+                            <button
+                                @click="deleteTicket(ticket.id)"
+                                class="text-red-500 hover:underline"
+                            >
+                                Supprimer
+                            </button>
+
+                            </template>
+
+
+
                             </td>
                         </tr>
                     </tbody>
