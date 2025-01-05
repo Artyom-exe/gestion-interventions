@@ -146,12 +146,24 @@ class TicketsController extends Controller
             abort(403, 'Vous n’êtes pas autorisé à supprimer un ticket.');
         }
 
+        // Récupération du ticket avec les images associées
         $ticket = Tickets::with('images')->findOrFail($id);
+
+        // Suppression des fichiers d'image sur le disque
+        foreach ($ticket->images as $image) {
+            Storage::disk('public')->delete($image->image_path);
+        }
+
+        // Suppression des images dans la base de données
         $ticket->images()->delete();
+
+        // Suppression du ticket
         $ticket->delete();
 
+        // Redirection avec un message de succès
         return redirect()->route('tickets.index')->with('success', 'Ticket et ses images supprimés avec succès.');
     }
+
 
     /**
      * Validate the request for storing or updating a ticket.

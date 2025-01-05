@@ -131,6 +131,13 @@ const sortedTickets = computed(() => {
                                         Modifier
                                     </a>
                                 </template>
+
+                                <!-- Lien Supprimer (réservé aux administrateurs) -->
+                                <template v-if="authUser.role === 'admin'">
+                                    <a :href="route('tickets.destroy', ticket.id)" class="text-red-500 hover:underline">
+                                        Supprimer
+                                    </a>
+                                </template>
                             </td>
                         </tr>
                     </tbody>
