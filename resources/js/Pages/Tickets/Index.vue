@@ -6,14 +6,17 @@ import NavLink from '@/Components/NavLink.vue';
 
 const props = defineProps({
     tickets: Array,
+    authUser: Object, // Utilisateur connecté
 });
 
+// Recherche et filtres
 const searchQuery = ref('');
 const statusFilter = ref('');
 const priorityFilter = ref('');
 const sortKey = ref('');
 const sortOrder = ref('asc');
 
+// Tickets filtrés par recherche et filtres
 const filteredTickets = computed(() => {
     return props.tickets.filter(ticket => {
         const matchesSearch = ticket.description.toLowerCase().includes(searchQuery.value.toLowerCase());
@@ -23,6 +26,7 @@ const filteredTickets = computed(() => {
     });
 });
 
+// Tickets triés
 const sortedTickets = computed(() => {
     return filteredTickets.value.sort((a, b) => {
         let modifier = sortOrder.value === 'asc' ? 1 : -1;
@@ -31,20 +35,10 @@ const sortedTickets = computed(() => {
         return 0;
     });
 });
-
-const sortByStatus = () => {
-    sortKey.value = 'status';
-    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
-};
-
-const sortByPriority = () => {
-    sortKey.value = 'priority';
-    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
-};
 </script>
 
 <template>
-    <AppLayout title="Ticket-page">
+    <AppLayout title="Tickets">
         <div class="container mx-auto p-4">
             <!-- Titre -->
             <h1 class="text-3xl font-bold mb-6 text-gray-800">Liste des Tickets</h1>
@@ -59,7 +53,8 @@ const sortByPriority = () => {
 
                 <!-- Filtre par statut -->
                 <div class="w-1/4">
-                    <select v-model="statusFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <select v-model="statusFilter"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <option value="">Tous les statuts</option>
                         <option value="ouvert">Ouvert</option>
                         <option value="en_cours">En cours</option>
@@ -69,7 +64,8 @@ const sortByPriority = () => {
 
                 <!-- Filtre par priorité -->
                 <div class="w-1/4">
-                    <select v-model="priorityFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <select v-model="priorityFilter"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <option value="">Toutes les priorités</option>
                         <option value="faible">Faible</option>
                         <option value="moyenne">Moyenne</option>
@@ -77,26 +73,14 @@ const sortByPriority = () => {
                     </select>
                 </div>
 
-                <!-- Bouton de création -->
-                <NavLink :href="route('tickets.create')"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-md transition duration-300">
-                    Créer un Ticket
-                </NavLink>
+                <!-- Bouton de création (réservé aux administrateurs) -->
+                <template v-if="authUser.role === 'admin'">
+                    <NavLink :href="route('tickets.create')"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-md transition duration-300">
+                        Créer un Ticket
+                    </NavLink>
+                </template>
             </div>
-
-            <!-- Dropdowns pour trier -->
-            <!-- <div class="flex justify-between items-center mb-4">
-                <div class="w-1/4">
-                    <button class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg" @click="sortByStatus">
-                        Trier par Statut
-                    </button>
-                </div>
-                <div class="w-1/4">
-                    <button class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg" @click="sortByPriority">
-                        Trier par Priorité
-                    </button>
-                </div>
-            </div> -->
 
             <!-- Tableau des tickets -->
             <div class="overflow-x-auto">
@@ -119,29 +103,34 @@ const sortByPriority = () => {
                             <td class="px-6 py-4 border-b text-gray-800">{{ ticket.description }}</td>
                             <td class="px-6 py-4 border-b">
                                 <span class="px-2 py-1 rounded-full text-white text-sm" :class="{
-                                'bg-green-500': ticket.status === 'ouvert',
-                                'bg-yellow-500': ticket.status === 'en_cours',
-                                'bg-red-500': ticket.status === 'fermé'
-                            }">
+                                    'bg-green-500': ticket.status === 'ouvert',
+                                    'bg-yellow-500': ticket.status === 'en_cours',
+                                    'bg-red-500': ticket.status === 'fermé'
+                                }">
                                     {{ ticket.status }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 border-b">
                                 <span class="px-2 py-1 rounded-full text-white text-sm" :class="{
-                                'bg-blue-500': ticket.priority === 'faible',
-                                'bg-yellow-500': ticket.priority === 'moyenne',
-                                'bg-red-500': ticket.priority === 'haute'
-                            }">
+                                    'bg-blue-500': ticket.priority === 'faible',
+                                    'bg-yellow-500': ticket.priority === 'moyenne',
+                                    'bg-red-500': ticket.priority === 'haute'
+                                }">
                                     {{ ticket.priority }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 border-b">
-                                <a :href="`/tickets/${ticket.id}`" class="text-blue-500 hover:underline mr-2">
+                                <!-- Lien Voir (disponible pour tous) -->
+                                <a :href="route('tickets.show', ticket.id)" class="text-blue-500 hover:underline mr-2">
                                     Voir
                                 </a>
-                                <a :href="`/tickets/${ticket.id}/edit`" class="text-green-500 hover:underline">
-                                    Modifier
-                                </a>
+
+                                <!-- Lien Modifier (réservé aux administrateurs) -->
+                                <template v-if="authUser.role === 'admin'">
+                                    <a :href="route('tickets.edit', ticket.id)" class="text-green-500 hover:underline">
+                                        Modifier
+                                    </a>
+                                </template>
                             </td>
                         </tr>
                     </tbody>

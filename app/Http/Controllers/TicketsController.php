@@ -16,18 +16,36 @@ class TicketsController extends Controller
      */
     public function index()
     {
-        $tickets = Tickets::with(['assignedUser', 'images', 'statusHistory'])->get();
+        $user = auth()->user();
+
+        if ($user->role === 'technicien') {
+            $tickets = Tickets::with(['assignedUser', 'images', 'statusHistory'])
+                ->where('assigned_to', $user->id)
+                ->get();
+        } elseif ($user->role === 'admin') {
+            $tickets = Tickets::with(['assignedUser', 'images', 'statusHistory'])->get();
+        } else {
+            abort(403, 'Accès non autorisé.');
+        }
 
         return \Inertia\Inertia::render('Tickets/Index', [
             'tickets' => $tickets,
+            'authUser' => $user, // Ajout de l'utilisateur connecté
         ]);
     }
+
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+        // Bloquer les techniciens
+        if (auth()->user()->role === 'technicien') {
+            abort(403, 'Vous n’êtes pas autorisé à créer un ticket.');
+        }
+
         $clients = \App\Models\User::where('role', 'client')->get(['id', 'username']);
         $technicians = \App\Models\User::where('role', 'technicien')->get(['id', 'username']);
 
@@ -36,7 +54,6 @@ class TicketsController extends Controller
             'technicians' => $technicians,
         ]);
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -76,6 +93,11 @@ class TicketsController extends Controller
      */
     public function edit($id)
     {
+        // Bloquer les techniciens
+        if (auth()->user()->role === 'technicien') {
+            abort(403, 'Vous n’êtes pas autorisé à modifier un ticket.');
+        }
+
         $ticket = Tickets::with('images')->findOrFail($id);
         $clients = \App\Models\User::where('role', 'client')->get(['id', 'username']);
         $technicians = \App\Models\User::where('role', 'technicien')->get(['id', 'username']);
@@ -119,8 +141,12 @@ class TicketsController extends Controller
      */
     public function destroy($id)
     {
-        $ticket = Tickets::with('images')->findOrFail($id);
+        // Bloquer les techniciens
+        if (auth()->user()->role === 'technicien') {
+            abort(403, 'Vous n’êtes pas autorisé à supprimer un ticket.');
+        }
 
+        $ticket = Tickets::with('images')->findOrFail($id);
         $ticket->images()->delete();
         $ticket->delete();
 
